@@ -1,0 +1,31 @@
+gcloud init
+gcloud auth login
+
+--- Build Locally & Upload ---
+
+# Specify the platform if you are running on ARM architecture
+docker build --platform linux/amd64 -t <docker-tag> .
+
+# Enable the APIs for container registry
+gcloud services enable containerregistry.googleapis.com
+
+# Tag the image correctly
+docker tag [SOURCE_IMAGE] [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]
+For example: docker tag my-image:latest eu.gcr.io/my-project-id/my-image-on-cloud:my-tag
+
+# Push the image on container registry
+docker push [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]
+For example: docker push eu.gcr.io/my-project-id/my-image-on-cloud:my-tag
+
+--- Create Cloud Run Service using gcloud ---
+
+# Using default parameters
+gcloud run deploy [cloud-run-service-name] --image [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]
+
+# Update (configure parameters)
+gcloud run deploy [cloud-run-service-name]
+    --concurrency=20 --cpu=1
+    --memory=1Gi --min-instances=1
+    --max-instances=100
+    --allow-unauthenticated
+    --image [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]
